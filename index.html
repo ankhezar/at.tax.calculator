@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Austria Tax Calc 2025 (Final)</title>
+    <title>Austria Tax Calc 2025 (Updated)</title>
     <style>
         :root {
             --primary: #dc2626;       
@@ -126,10 +126,8 @@
             white-space: normal;
         }
         .popover.visible { display: block; animation: fadeIn 0.2s ease-out; }
-        /* Right alignment for popovers near the right edge */
         .popover.right { left: auto; right: 0; }
         
-        /* Mobile adjust to prevent overflow */
         @media (max-width: 450px) {
             .popover { width: 260px; }
             .popover.right { right: -10px; }
@@ -375,9 +373,9 @@
 
 <script>
     const CONFIG = {
-        limits: { vat: 55000, pausch_klein: 40000, geringf: 6221.28 },
+        limits: { vat: 55000, pausch_klein: 40000, geringf: 6453.36 }, // 2025: 537,78 * 12
         rates: {
-            svs_kv: 0.0680, svs_pv: 0.1850, svs_self: 0.0153, svs_uv_yr: 11.35 * 12, 
+            svs_kv: 0.0680, svs_pv: 0.1850, svs_self: 0.0153, svs_uv_yr: 141.48, // 2025: 11,79 * 12
             gfb: 0.15, gfb_max: 4500
         },
         family: { fabo_plus: 2000, avab_1: 572, avab_2: 774, avab_next: 255 },
@@ -405,7 +403,7 @@
             lbl_total_tax: "Gesamtabgaben:",
             
             desc_haupt: "<span class='pop-title'>Hauptberuflich (GSVG)</span>Sie sind voll bei der SVS versichert (Pensions-, Kranken-, Unfallversicherung).<br><br>⚠️ <strong>Achtung Neugründer:</strong> In Österreich gibt es keinen dauerhaften Rabatt. Sie zahlen in den ersten 2 Jahren zwar weniger Beiträge (~150€/Monat), aber das ist nur eine Anzahlung! Die SVS fordert die Differenz im 3. Jahr zurück (Nachzahlung).",
-            desc_neben: "<span class='pop-title'>Nebenberuflich</span>Sie haben bereits einen Hauptjob (ASVG, über 40h), der Sie versichert.<br><ul class='pop-list'><li><strong>Gewinn < 6.221€:</strong> Sie zahlen nur ~136€/Jahr Unfallversicherung.</li><li><strong>Gewinn > 6.221€:</strong> Sie müssen sich voll bei der SVS versichern (teuer!).</li></ul>",
+            desc_neben: "<span class='pop-title'>Nebenberuflich</span>Sie haben bereits einen Hauptjob (ASVG, über 40h), der Sie versichert.<br><ul class='pop-list'><li><strong>Gewinn < 6.453€:</strong> Sie zahlen nur ~141€/Jahr Unfallversicherung.</li><li><strong>Gewinn > 6.453€:</strong> Sie müssen sich voll bei der SVS versichern (teuer!).</li></ul>",
             desc_revenue: "<span class='pop-title'>Limits & Regeln</span>Geben Sie Ihren <strong>Netto-Umsatz</strong> ein (exklusive Umsatzsteuer).<br><br><ul class='pop-list'><li><strong>Bis 40.000 €:</strong> Sicherer Bereich für Kleinunternehmer-Pauschale.</li><li><strong>Bis 55.000 €:</strong> Erlaubt als einmalige Ausnahme (Toleranzregel, 1x in 5 Jahren).</li><li><strong>Über 55.000 €:</strong> Sie werden Umsatzsteuerpflichtig und fallen aus der Kleinunternehmer-Regelung!</li></ul>",
             desc_type: "<span class='pop-title'>Materialintensität</span>Bestimmt den Pauschalsatz.<br><br><strong>Dienstleistung (20% / 6%):</strong><br>Wissensbasierte Berufe mit wenig Ausgaben. Z.B. IT, Beratung, Buchhaltung, Lehrer.<br><br><strong>Handel & Gewerbe (45% / 12%):</strong><br>Berufe, die Material einkaufen oder produzieren. Z.B. Handwerk, Bau, Shop-Betreiber.",
             desc_pausch: "<span class='pop-title'>Welche Pauschale?</span><strong>1. Kleinunternehmer-Pauschale:</strong><br>Ideal für Umsatz < 40k. Hohe Abzugssätze (45% oder 20%). Keine Buchführung nötig.<br><br><strong>2. Basispauschalierung:</strong><br>Für Umsatz bis 220k. Niedrigere Sätze (12% oder 6%). Lohnt sich bei hohem Umsatz.",
@@ -437,7 +435,7 @@
             lbl_total_tax: "Total Deductions:",
             
             desc_haupt: "<span class='pop-title'>Full-Time (GSVG)</span>Fully insured with SVS.<br><br>⚠️ <strong>Startup Warning:</strong> Unlike Slovenia, Austria has no permanent 'discount'. Reduced rates in years 1-2 are only deferred payments. SVS will ask for a <strong>back-payment (Nachzahlung)</strong> later.",
-            desc_neben: "<span class='pop-title'>Side Business</span>You have a main job (40h) elsewhere.<br><ul class='pop-list'><li><strong>Profit < 6.221€:</strong> You pay only ~136€/year accident insurance.</li><li><strong>Profit > 6.221€:</strong> You must pay full SVS contributions.</li></ul>",
+            desc_neben: "<span class='pop-title'>Side Business</span>You have a main job (40h) elsewhere.<br><ul class='pop-list'><li><strong>Profit < 6.453€:</strong> You pay only ~141€/year accident insurance.</li><li><strong>Profit > 6.453€:</strong> You must pay full SVS contributions.</li></ul>",
             desc_revenue: "<span class='pop-title'>Limits & Rules</span>Enter <strong>Revenue excluding VAT</strong>.<br><br><ul class='pop-list'><li><strong>Up to 40,000 €:</strong> Safe zone for Small Biz Flat Rate.</li><li><strong>Up to 55,000 €:</strong> Allowed once every 5 years (Tolerance Rule).</li><li><strong>Over 55,000 €:</strong> You become liable for VAT and lose the Small Biz Flat Rate!</li></ul>",
             desc_type: "<span class='pop-title'>Material Intensity</span>Determines expense rate.<br><br><strong>Service (20% / 6%):</strong><br>Knowledge-based, low cost. IT, Consulting, Teaching.<br><br><strong>Trade (45% / 12%):</strong><br>Buying/Selling goods or production. Crafts, Shops, Construction.",
             desc_pausch: "<span class='pop-title'>Which Method?</span><strong>1. Small Biz (Kleinunternehmer):</strong><br>Best for < 40k. High expense deduction (45% or 20%).<br><br><strong>2. Basic (Basispauschale):</strong><br>For revenue up to 220k. Lower deduction rates (12% or 6%).",
@@ -469,7 +467,7 @@
             lbl_total_tax: "Skupaj dajatve:",
             
             desc_haupt: "<span class='pop-title'>Polni S.P. (GSVG)</span>Polno zavarovanje pri SVS.<br><br>⚠️ <strong>Opozorilo:</strong> V Avstriji ni trajnega popusta za nove podjetnike. Prvi dve leti plačujete manj, a SVS v 3. letu naredi poračun (doplačilo)!",
-            desc_neben: "<span class='pop-title'>Popoldanski S.P.</span>Zavarovani ste preko redne službe (40h).<br><ul class='pop-list'><li><strong>Dobiček < 6.221€:</strong> Plačate le ~136€/leto za nezgodno zavarovanje.</li><li><strong>Dobiček > 6.221€:</strong> Plačati morate polne prispevke SVS.</li></ul>",
+            desc_neben: "<span class='pop-title'>Popoldanski S.P.</span>Zavarovani ste preko redne službe (40h).<br><ul class='pop-list'><li><strong>Dobiček < 6.453€:</strong> Plačate le ~141€/leto za nezgodno zavarovanje.</li><li><strong>Dobiček > 6.453€:</strong> Plačati morate polne prispevke SVS.</li></ul>",
             desc_revenue: "<span class='pop-title'>Limiti</span>Vnesite <strong>Promet brez DDV</strong>.<br><br><ul class='pop-list'><li><strong>Do 40.000 €:</strong> Varno območje za Malega podjetnika.</li><li><strong>Do 55.000 €:</strong> Dovoljeno enkrat na 5 let (toleranca).</li><li><strong>Nad 55.000 €:</strong> Postanete zavezanec za DDV in izgubite status malega podjetnika!</li></ul>",
             desc_type: "<span class='pop-title'>Vrsta dejavnosti</span>Določa višino stroškov.<br><br><strong>Storitve (20% / 6%):</strong><br>Intelektualne storitve, IT, svetovanje.<br><br><strong>Trgovina (45% / 12%):</strong><br>Prodaja blaga, proizvodnja, obrt, gostinstvo.",
             desc_pausch: "<span class='pop-title'>Kateri pavšal?</span><strong>1. Mali podjetnik (Kleinunternehmer):</strong><br>Najbolje za < 40k. Visoki stroški (45% ali 20%). Brez knjigovodstva.<br><br><strong>2. Osnovni pavšal (Basis):</strong><br>Za promet do 220k. Nižji stroški (12% ali 6%).",
@@ -501,7 +499,7 @@
             lbl_total_tax: "Всього податків:",
             
             desc_haupt: "<span class='pop-title'>Основна зайнятість (GSVG)</span>Повне страхування SVS.<br><br>⚠️ <strong>Увага:</strong> В Австрії немає постійної знижки. Перші 2 роки ви платите менше, але на 3-й рік SVS вимагатиме доплату (Nachzahlung)!",
-            desc_neben: "<span class='pop-title'>Додаткова зайнятість</span>Ви застраховані на основній роботі.<br><ul class='pop-list'><li><strong>Прибуток < 6.221€:</strong> Лише ~136€/рік (страховка від нещасних випадків).</li><li><strong>Прибуток > 6.221€:</strong> Повні внески SVS.</li></ul>",
+            desc_neben: "<span class='pop-title'>Додаткова зайнятість</span>Ви застраховані на основній роботі.<br><ul class='pop-list'><li><strong>Прибуток < 6.453€:</strong> Лише ~141€/рік (страховка від нещасних випадків).</li><li><strong>Прибуток > 6.453€:</strong> Повні внески SVS.</li></ul>",
             desc_revenue: "<span class='pop-title'>Ліміти</span>Введіть <strong>Дохід без ПДВ</strong>.<br><br><ul class='pop-list'><li><strong>До 40.000 €:</strong> Безпечна зона для малого підприємця.</li><li><strong>До 55.000 €:</strong> Дозволено 1 раз на 5 років.</li><li><strong>Понад 55.000 €:</strong> Ви стаєте платником ПДВ і втрачаєте статус!</li></ul>",
             desc_type: "<span class='pop-title'>Тип діяльності</span>Визначає відсоток витрат.<br><br><strong>Послуги (20% / 6%):</strong><br>IT, консалтинг, викладання.<br><br><strong>Торгівля (45% / 12%):</strong><br>Продаж товарів, ремесла, будівництво.",
             desc_pausch: "<span class='pop-title'>Який паушал?</span><strong>1. Малий підприємець (Kleinunternehmer):</strong><br>Краще для < 40k. Високі витрати (45% або 20%).<br><br><strong>2. Базовий (Basis):</strong><br>Для доходу до 220k. Нижчі витрати (12% або 6%).",
@@ -673,7 +671,8 @@
         // 2. SVS Calculation
         let rawProfit = rev - expenses;
         let svsBase = rawProfit; 
-        const minBaseGSVG = 6010.92; 
+        const minBaseGSVG = 6453.36; // 2025: 537,78 * 12
+        const maxBaseGSVG = 86352; // 2025: 7196 * 12
         
         let svsTotal = 0, svsKV = 0, svsPV = 0, svsSelf = 0;
         
@@ -681,7 +680,7 @@
             svsTotal = CONFIG.rates.svs_uv_yr;
         } else {
             let insuranceBase = Math.max(svsBase, minBaseGSVG); 
-            insuranceBase = Math.min(insuranceBase, 84840);
+            insuranceBase = Math.min(insuranceBase, maxBaseGSVG);
 
             svsKV = insuranceBase * CONFIG.rates.svs_kv;
             svsPV = insuranceBase * CONFIG.rates.svs_pv;
