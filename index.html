@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Austria Tax Calc 2025 (Final)</title>
+    <style>
+        :root {
+            --primary: #dc2626;       
+            --primary-hover: #b91c1c; 
+            --primary-subtle: #fef2f2;
+            --bg-body: #f8fafc;       
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --text-main: #0f172a;     
+            --text-muted: #64748b;    
+            --border: #e2e8f0;        
+            --ring-focus: rgba(220, 38, 38, 0.3);
+            --success-text: #059669;  
+            --danger-text: #dc2626;   
+            --warning-bg: #fffbeb;    
+            --warning-text: #92400e;  
+            --breach-bg: #fef2f2;     
+            --breach-border: #fecaca; 
+            --badge-bg: #f1f5f9;
+            --badge-text: #475569;
+        }
+        [data-theme="dark"] {
+            --primary: #f87171; --primary-hover: #ef4444; --primary-subtle: #450a0a;
+            --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #0f172a;
+            --text-main: #f8fafc; --text-muted: #94a3b8; --border: #334155;
+            --ring-focus: rgba(248, 113, 113, 0.3); --success-text: #34d399;
+            --danger-text: #f87171; --warning-bg: #451a03; --warning-text: #fcd34d;
+            --breach-bg: #450a0a; --breach-border: #7f1d1d; --badge-bg: #334155; --badge-text: #cbd5e1;
+        }
+        * { box-sizing: border-box; touch-action: manipulation; }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main);
+            margin: 0; padding: 24px; display: flex; justify-content: center; line-height: 1.5;
+        }
+        .container {
+            background-color: var(--bg-card); width: 100%; max-width: 720px; padding: 2rem;
+            border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border);
+        }
+        @media (max-width: 480px) {
+            body { padding: 0; } .container { padding: 1.25rem 1rem; border: none; border-radius: 0; }
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .brand { display: flex; align-items: center; gap: 16px; }
+        .brand-logo { font-size: 2.5rem; line-height: 1; cursor: default; }
+        .brand-text h1 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+        .year-badge {
+            background-color: var(--primary-subtle); color: var(--primary); font-size: 0.75rem;
+            font-weight: 600; padding: 2px 10px; border-radius: 9999px; margin-left: 8px; vertical-align: middle;
+        }
+        .controls { display: flex; gap: 8px; }
+        .btn-icon {
+            background: transparent; border: 1px solid var(--border); color: var(--text-main);
+            padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 500;
+        }
+        .toggle-group { display: flex; background: var(--bg-body); padding: 4px; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .toggle-btn { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 600; color: var(--text-muted); border-radius: 8px; font-size: 0.9rem; transition: all 0.2s; }
+        .toggle-btn.active { background: var(--bg-card); color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-content { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; gap: 1rem; } }
+        
+        .form-group { position: relative; }
+        
+        /* FIXED LABEL ROW & POPOVER ANCHORING */
+        .label-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--text-main); }
+        
+        .help-wrapper {
+            position: relative; /* This ensures popover attaches HERE */
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .form-control {
+            width: 100%; height: 48px; padding: 0 16px; padding-right: 70px; border: 1px solid var(--border);
+            background-color: var(--bg-input); color: var(--text-main); border-radius: 10px; font-size: 1rem; appearance: none;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring-focus); }
+        select.form-control { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; padding-right: 40px; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        
+        .partner-switch-container { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 16px; border: 1px solid var(--border); border-radius: 10px; background-color: var(--bg-input); cursor: pointer; transition: border-color 0.2s; }
+        .partner-switch-container:hover { border-color: var(--text-muted); }
+        .partner-label { font-size: 0.9rem; font-weight: 500; color: var(--text-main); }
+        .partner-limit-badge { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); background: var(--badge-bg); padding: 2px 8px; border-radius: 6px; margin-left: 8px; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .spinner-group { position: absolute; right: 6px; top: 6px; bottom: 6px; display: flex; gap: 4px; }
+        .spin-btn { width: 28px; height: 100%; border: none; background: var(--bg-body); border-radius: 6px; color: var(--primary); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .spin-btn:hover { background: var(--primary-subtle); }
+        
+        .info-trigger { cursor: pointer; color: var(--primary); margin-left: 6px; font-size: 0.9rem; background: var(--primary-subtle); width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; font-weight: bold; display: inline-block; flex-shrink: 0; }
+        
+        /* POPOVER FIXED */
+        .popover {
+            display: none; 
+            position: absolute; 
+            top: 24px; /* Just below the wrapper */
+            left: 0; 
+            width: 280px; 
+            background: var(--bg-card); 
+            border: 1px solid var(--border); 
+            padding: 16px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15); 
+            z-index: 1000; 
+            font-size: 0.85rem; 
+            font-weight: 400; 
+            color: var(--text-muted); 
+            line-height: 1.5; 
+            margin-top: 6px; 
+            text-align: left; 
+            white-space: normal;
+        }
+        .popover.visible { display: block; animation: fadeIn 0.2s ease-out; }
+        /* Right alignment for popovers near the right edge */
+        .popover.right { left: auto; right: 0; }
+        
+        /* Mobile adjust to prevent overflow */
+        @media (max-width: 450px) {
+            .popover { width: 260px; }
+            .popover.right { right: -10px; }
+        }
+
+        .pop-title { font-weight: 700; color: var(--text-main); display: block; margin-bottom: 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px;}
+        .pop-list { margin: 8px 0 8px 0; padding-left: 1.2rem; font-size: 0.8rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .section-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 1.5rem 0 1rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .view-controls { display: flex; justify-content: center; margin-bottom: 1rem; margin-top: 2rem; }
+        .view-toggle { display: inline-flex; background: var(--bg-body); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+        .view-btn { padding: 6px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text-muted); border-radius: 6px; transition: all 0.2s; }
+        .view-btn.active { background: var(--bg-card); color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .results-card { background-color: var(--bg-body); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .result-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; font-size: 0.95rem; position: relative; }
+        .result-row.sub { padding-left: 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-muted); border-left: 2px solid var(--border); }
+        .result-row.total { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); font-weight: 700; font-size: 1.25rem; color: var(--text-main); }
+        .result-row.summary { justify-content: flex-end; margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); text-align: right; }
+        .val { font-family: 'Courier New', monospace; font-weight: 700; }
+        .text-red { color: var(--danger-text); }
+        .text-green { color: var(--success-text); }
+        .badge { display: inline-block; background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; padding: 1px 8px; border-radius: 6px; font-weight: 500; margin-left: 8px; vertical-align: middle; }
+        
+        .limit-alert { margin-top: 1rem; padding: 16px; border-radius: 12px; background-color: var(--warning-bg); color: var(--warning-text); font-size: 0.9rem; font-weight: 500; display: none; border: 1px solid rgba(0,0,0,0.05); line-height: 1.5; }
+        .limit-alert.breach { background-color: var(--breach-bg); color: var(--danger-text); border: 1px solid var(--breach-border); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="brand">
+            <div class="brand-logo">🇦🇹</div>
+            <div class="brand-text">
+                <h1>Selbstständig <span class="year-badge">2025</span></h1>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn-icon" onclick="toggleLang()" id="btn-lang">DE</button>
+            <button class="btn-icon" onclick="toggleTheme()" id="btn-theme">🌗</button>
+        </div>
+    </div>
+
+    <div class="toggle-group">
+        <div class="toggle-btn active" onclick="setMode('haupt', event)" id="tab-haupt">
+            <div class="btn-content">
+                <span data-t="tab_main">Hauptberuflich</span>
+                <div class="help-wrapper">
+                    <span class="info-trigger" data-tip="pop-desc-haupt">?</span>
+                    <div id="pop-desc-haupt" class="popover"><span data-t="desc_haupt"></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="toggle-btn" onclick="setMode('neben', event)" id="tab-neben">
+            <div class="btn-content">
+                <span data-t="tab_side">Nebenberuflich</span>
+                <div class="help-wrapper">
+                    <span class="info-trigger" data-tip="pop-desc-neben">?</span>
+                    <div id="pop-desc-neben" class="popover right"><span data-t="desc_neben"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title" data-t="sec_biz">Geschäftsdaten</div>
+    <div class="input-grid">
+        <div class="form-group">
+            <div class="label-row">
+                <span class="help-wrapper">
+                    <span data-t="label_revenue">Jahresumsatz (exkl. USt)</span>
+                    <span class="info-trigger" data-tip="pop-rev">?</span>
+                    <div id="pop-rev" class="popover"><span data-t="desc_revenue"></span></div>
+                </span>
+            </div>
+            <div class="input-wrapper">
+                <input type="number" id="revenue" class="form-control" value="40000" min="0" step="1000" oninput="calc()">
+                <div class="spinner-group">
+                    <button type="button" class="spin-btn" onclick="stepVal('revenue', -1)">−</button>
+                    <button type="button" class="spin-btn" onclick="stepVal('revenue', 1)">+</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="label-row">
+                <span class="help-wrapper">
+                    <span data-t="label_type">Tätigkeitsart</span>
+                    <span class="info-trigger" data-tip="pop-type">?</span>
+                    <div id="pop-type" class="popover right"><span data-t="desc_type"></span></div>
+                </span>
+            </div>
+            <select id="biz-type" class="form-control" onchange="updatePauschOptions()">
+                <option value="service" data-t="opt_service">Dienstleistung (Wissen)</option>
+                <option value="trade" data-t="opt_trade">Handel / Produktion</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="input-grid">
+        <div class="form-group">
+            <div class="label-row">
+                <span class="help-wrapper">
+                    <span data-t="label_pausch">Pauschalierung</span>
+                    <span class="info-trigger" data-tip="pop-pausch">?</span>
+                    <div id="pop-pausch" class="popover"><span data-t="desc_pausch"></span></div>
+                </span>
+            </div>
+            <select id="pausch-type" class="form-control" onchange="calc()">
+                <!-- Options populated by JS -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <div class="label-row">
+                <span class="help-wrapper">
+                    <span data-t="label_svs">SVS Beiträge (Vj.)</span>
+                    <span class="info-trigger" data-tip="pop-svs-in">?</span>
+                    <div id="pop-svs-in" class="popover right"><span data-t="desc_svs_input"></span></div>
+                </span>
+            </div>
+            <div class="input-wrapper">
+                <input type="number" id="svs-paid" class="form-control" placeholder="0" min="0" step="100" oninput="calc()">
+                <div class="spinner-group">
+                    <button type="button" class="spin-btn" onclick="stepVal('svs-paid', -1)">−</button>
+                    <button type="button" class="spin-btn" onclick="stepVal('svs-paid', 1)">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title" data-t="sec_fam">Familie & Absetzbeträge</div>
+    <div class="input-grid">
+        <div class="form-group">
+            <div class="label-row">
+                <span class="help-wrapper">
+                    <span data-t="label_kids">Kinder (< 18J)</span>
+                    <span class="info-trigger" data-tip="pop-fam">?</span>
+                    <div id="pop-fam" class="popover"><span data-t="desc_fam"></span></div>
+                </span>
+            </div>
+            <div class="input-wrapper">
+                <input type="number" id="kids" class="form-control" value="0" min="0" max="10" oninput="calc()">
+                <div class="spinner-group">
+                    <button type="button" class="spin-btn" onclick="stepVal('kids', -1)">−</button>
+                    <button type="button" class="spin-btn" onclick="stepVal('kids', 1)">+</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="label-row">
+                <span class="help-wrapper">
+                    <span data-t="label_sole">Alleinverdiener (AVAB)</span>
+                    <span class="info-trigger" data-tip="pop-sole">?</span>
+                    <div id="pop-sole" class="popover right"><span data-t="desc_sole"></span></div>
+                </span>
+            </div>
+            <label class="partner-switch-container" for="is-sole">
+                <div>
+                    <span class="partner-label" data-t="lbl_partner_inc">Partner Einkommen</span>
+                    <span class="partner-limit-badge">&lt; 6.937 €</span>
+                </div>
+                <div class="switch">
+                    <input type="checkbox" id="is-sole" onchange="calc()">
+                    <span class="slider"></span>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <div class="view-controls">
+        <div class="view-toggle">
+            <div class="view-btn" onclick="setView('monthly')" id="view-mo" data-t="view_mo">Monat</div>
+            <div class="view-btn active" onclick="setView('yearly')" id="view-yr" data-t="view_yr">Jahr</div>
+        </div>
+    </div>
+
+    <div class="results-card">
+        <div class="result-row">
+            <span>
+                <span data-t="res_expenses">Pauschal-Ausgaben</span>
+                <span id="badge-exp" class="badge">20%</span>
+            </span>
+            <span class="val" id="out-exp">0.00 €</span>
+        </div>
+        <div class="result-row">
+            <span class="help-wrapper">
+                <span data-t="res_profit">Steuerbasis</span>
+                <span class="info-trigger" data-tip="pop-taxbase">?</span>
+                <div id="pop-taxbase" class="popover"><span data-t="desc_taxbase"></span></div>
+            </span>
+            <span class="val" id="out-profit">0.00 €</span>
+        </div>
+        <div class="result-row">
+            <span>
+                <span data-t="res_tax">Einkommensteuer</span>
+                <span id="badge-tax" class="badge">0%</span>
+            </span>
+            <span class="val text-red" id="out-tax">0.00 €</span>
+        </div>
+        
+        <div id="tax-credits-row" style="display:none; width:100%;">
+            <div class="result-row sub" style="width:100%;">
+                <span class="help-wrapper">
+                    <span data-t="lbl_credits">Familienbonus + AVAB</span>
+                    <span class="info-trigger" data-tip="pop-cred-res">?</span>
+                    <div id="pop-cred-res" class="popover"><span data-t="desc_cred_res"></span></div>
+                </span>
+                <span class="val text-green" id="out-credits">-0.00 €</span>
+            </div>
+        </div>
+
+        <div class="result-row">
+            <span>
+                <span data-t="res_svs">SVS Beiträge</span>
+                <span id="badge-svs" class="badge">~26%</span>
+            </span>
+            <span class="val text-red" id="out-svs-total">0.00 €</span>
+        </div>
+
+        <div id="breakdown-container">
+            <div class="result-row sub"><span data-t="det_kv">Kranken (KV)</span><span class="val" id="out-kv">0.00 €</span></div>
+            <div class="result-row sub"><span data-t="det_pv">Pensions (PV)</span><span class="val" id="out-pv">0.00 €</span></div>
+            <div class="result-row sub"><span data-t="det_sv">Selbstst. (SVS)</span><span class="val" id="out-sv">0.00 €</span></div>
+        </div>
+        
+        <div class="result-row total">
+            <span id="lbl-net">Netto (Jahr)</span>
+            <span class="val text-green" id="out-net">0.00 €</span>
+        </div>
+        <div class="result-row summary">
+            <span>
+                <span data-t="lbl_total_tax">Abgabenquote:</span> 
+                <strong id="out-total-paid">0.00 €</strong> 
+                (<span id="out-effective-rate">0.0%</span>)
+            </span>
+        </div>
+    </div>
+
+    <div id="alert-box" class="limit-alert"></div>
+</div>
+
+<script>
+    const CONFIG = {
+        limits: { vat: 55000, pausch_klein: 40000, geringf: 6221.28 },
+        rates: {
+            svs_kv: 0.0680, svs_pv: 0.1850, svs_self: 0.0153, svs_uv_yr: 11.35 * 12, 
+            gfb: 0.15, gfb_max: 4500
+        },
+        family: { fabo_plus: 2000, avab_1: 572, avab_2: 774, avab_next: 255 },
+        tax_brackets: [
+            { limit: 13308, rate: 0.00 }, { limit: 21617, rate: 0.20 },
+            { limit: 35836, rate: 0.30 }, { limit: 69166, rate: 0.40 },
+            { limit: 103072, rate: 0.48 }, { limit: 1000000, rate: 0.50 }
+        ]
+    };
+
+    const TEXT = {
+        de: {
+            tab_main: "Hauptberuflich", tab_side: "Nebenberuflich",
+            sec_biz: "Geschäftsdaten", sec_fam: "Familie & Absetzbeträge",
+            label_revenue: "Jahresumsatz (exkl. USt)", label_type: "Tätigkeit", label_pausch: "Pauschalierung", label_svs: "Bezahlte SVS (Vj.)",
+            label_kids: "Kinder (< 18J)", label_sole: "Alleinverdiener (AVAB)", lbl_partner_inc: "Partner Einkommen",
+            
+            opt_service: "Dienstleistung (Wissen)", opt_trade: "Handel / Produktion",
+            opt_klein_serv: "Kleinunternehmer (20%)", opt_klein_trade: "Kleinunternehmer (45%)", 
+            opt_basis_serv: "Basispauschale (6%)", opt_basis_trade: "Basispauschale (12%)",
+            
+            res_expenses: "Pauschal-Ausgaben", res_profit: "Steuerbasis", res_tax: "Einkommensteuer",
+            res_svs: "SVS Beiträge", res_net: "Netto", lbl_credits: "Familienbonus + AVAB",
+            det_kv: "Kranken (KV)", det_pv: "Pensions (PV)", det_sv: "Vorsorge (Selbst)",
+            lbl_total_tax: "Gesamtabgaben:",
+            
+            desc_haupt: "<span class='pop-title'>Hauptberuflich (GSVG)</span>Sie sind voll bei der SVS versichert (Pensions-, Kranken-, Unfallversicherung).<br><br>⚠️ <strong>Achtung Neugründer:</strong> In Österreich gibt es keinen dauerhaften Rabatt. Sie zahlen in den ersten 2 Jahren zwar weniger Beiträge (~150€/Monat), aber das ist nur eine Anzahlung! Die SVS fordert die Differenz im 3. Jahr zurück (Nachzahlung).",
+            desc_neben: "<span class='pop-title'>Nebenberuflich</span>Sie haben bereits einen Hauptjob (ASVG, über 40h), der Sie versichert.<br><ul class='pop-list'><li><strong>Gewinn < 6.221€:</strong> Sie zahlen nur ~136€/Jahr Unfallversicherung.</li><li><strong>Gewinn > 6.221€:</strong> Sie müssen sich voll bei der SVS versichern (teuer!).</li></ul>",
+            desc_revenue: "<span class='pop-title'>Limits & Regeln</span>Geben Sie Ihren <strong>Netto-Umsatz</strong> ein (exklusive Umsatzsteuer).<br><br><ul class='pop-list'><li><strong>Bis 40.000 €:</strong> Sicherer Bereich für Kleinunternehmer-Pauschale.</li><li><strong>Bis 55.000 €:</strong> Erlaubt als einmalige Ausnahme (Toleranzregel, 1x in 5 Jahren).</li><li><strong>Über 55.000 €:</strong> Sie werden Umsatzsteuerpflichtig und fallen aus der Kleinunternehmer-Regelung!</li></ul>",
+            desc_type: "<span class='pop-title'>Materialintensität</span>Bestimmt den Pauschalsatz.<br><br><strong>Dienstleistung (20% / 6%):</strong><br>Wissensbasierte Berufe mit wenig Ausgaben. Z.B. IT, Beratung, Buchhaltung, Lehrer.<br><br><strong>Handel & Gewerbe (45% / 12%):</strong><br>Berufe, die Material einkaufen oder produzieren. Z.B. Handwerk, Bau, Shop-Betreiber.",
+            desc_pausch: "<span class='pop-title'>Welche Pauschale?</span><strong>1. Kleinunternehmer-Pauschale:</strong><br>Ideal für Umsatz < 40k. Hohe Abzugssätze (45% oder 20%). Keine Buchführung nötig.<br><br><strong>2. Basispauschalierung:</strong><br>Für Umsatz bis 220k. Niedrigere Sätze (12% oder 6%). Lohnt sich bei hohem Umsatz.",
+            desc_svs_input: "Nur für die exakte Steuerberechnung: Geben Sie hier ein, was Sie dieses Jahr tatsächlich an die SVS überwiesen haben. Das mindert Ihre Steuerbasis.",
+            
+            desc_fam: "<span class='pop-title'>Familienbonus Plus</span><strong>Was ist das?</strong><br>Ein direkter Steuerabsetzbetrag. Er reduziert Ihre Einkommensteuer.<br><br><strong>Wie viel?</strong><br>• Bis zu 2.000 € pro Kind (unter 18).<br>• Bis zu 650 € pro Kind (über 18).",
+            desc_sole: "<span class='pop-title'>Alleinverdiener (AVAB)</span><strong>Was ist das?</strong><br>Ein <em>erstattungsfähiger</em> Steuerabsetzbetrag (Negativsteuer). Sie bekommen das Geld auch ausgezahlt, wenn Sie gar keine Lohnsteuer zahlen!<br><br><strong>Voraussetzungen:</strong><br>1. Sie haben mindestens <strong>1 Kind</strong> (Familienbeihilfe).<br>2. Sie sind mehr als 6 Monate verheiratet/verpartnert.<br>3. Das Einkommen Ihres Partners liegt unter <strong>6.937 €</strong> pro Jahr.",
+            
+            desc_taxbase: "<span class='pop-title'>Steuerbemessungsgrundlage</span>Dies ist der Betrag, auf den Sie tatsächlich Einkommensteuer zahlen.<br><br><strong>Berechnung:</strong><br>+ Umsatz (Exkl. USt)<br>− Pauschale Ausgaben<br>− Bezahlte SVS Beiträge<br>− Gewinnfreibetrag (15%)<br>= <strong>Steuerbasis</strong>",
+            desc_cred_res: "<span class='pop-title'>Absetzbeträge</span>Dies ist die Summe aus <strong>Familienbonus Plus</strong> und <strong>Alleinverdienerabsetzbetrag</strong>.<br><br>Dieser Betrag wird direkt von Ihrer errechneten Lohnsteuer abgezogen. Ist das Ergebnis negativ, erhalten Sie eine Gutschrift (nur AVAB).",
+
+            view_mo: "Monat", view_yr: "Jahr", net_mo: "Netto (Monat)", net_yr: "Netto (Jahr)",
+            alert_limit: "⚠️ UMSATZSCHWELLE (55k): Über 55.000 € werden Sie umsatzsteuerpflichtig! Kleinunternehmer-Status erlischt.",
+            alert_joker: "⚠️ TOLERANZREGEL: Zwischen 40.000 € und 55.000 € ist die Kleinunternehmer-Pauschale nur <strong>1x in 5 Jahren</strong> erlaubt!"
+        },
+        en: {
+            tab_main: "Full-Time", tab_side: "Side Business",
+            sec_biz: "Business Data", sec_fam: "Family & Tax Credits",
+            label_revenue: "Annual Revenue (excl. VAT)", label_type: "Activity", label_pausch: "Exp. Method", label_svs: "Paid SVS (Last Yr)",
+            label_kids: "Children (< 18y)", label_sole: "Sole Earner (AVAB)", lbl_partner_inc: "Partner Income",
+            
+            opt_service: "Service / Knowledge", opt_trade: "Trade / Production",
+            opt_klein_serv: "Small Biz: Service (20%)", opt_klein_trade: "Small Biz: Trade (45%)", 
+            opt_basis_serv: "Basic Flat Rate (6%)", opt_basis_trade: "Basic Flat Rate (12%)",
+            
+            res_expenses: "Flat Expenses", res_profit: "Tax Base", res_tax: "Income Tax",
+            res_svs: "SVS Contributions", res_net: "Net Income", lbl_credits: "Family Bonus + AVAB",
+            det_kv: "Health (KV)", det_pv: "Pension (PV)", det_sv: "Provision (Self)",
+            lbl_total_tax: "Total Deductions:",
+            
+            desc_haupt: "<span class='pop-title'>Full-Time (GSVG)</span>Fully insured with SVS.<br><br>⚠️ <strong>Startup Warning:</strong> Unlike Slovenia, Austria has no permanent 'discount'. Reduced rates in years 1-2 are only deferred payments. SVS will ask for a <strong>back-payment (Nachzahlung)</strong> later.",
+            desc_neben: "<span class='pop-title'>Side Business</span>You have a main job (40h) elsewhere.<br><ul class='pop-list'><li><strong>Profit < 6.221€:</strong> You pay only ~136€/year accident insurance.</li><li><strong>Profit > 6.221€:</strong> You must pay full SVS contributions.</li></ul>",
+            desc_revenue: "<span class='pop-title'>Limits & Rules</span>Enter <strong>Revenue excluding VAT</strong>.<br><br><ul class='pop-list'><li><strong>Up to 40,000 €:</strong> Safe zone for Small Biz Flat Rate.</li><li><strong>Up to 55,000 €:</strong> Allowed once every 5 years (Tolerance Rule).</li><li><strong>Over 55,000 €:</strong> You become liable for VAT and lose the Small Biz Flat Rate!</li></ul>",
+            desc_type: "<span class='pop-title'>Material Intensity</span>Determines expense rate.<br><br><strong>Service (20% / 6%):</strong><br>Knowledge-based, low cost. IT, Consulting, Teaching.<br><br><strong>Trade (45% / 12%):</strong><br>Buying/Selling goods or production. Crafts, Shops, Construction.",
+            desc_pausch: "<span class='pop-title'>Which Method?</span><strong>1. Small Biz (Kleinunternehmer):</strong><br>Best for < 40k. High expense deduction (45% or 20%).<br><br><strong>2. Basic (Basispauschale):</strong><br>For revenue up to 220k. Lower deduction rates (12% or 6%).",
+            desc_svs_input: "Enter the amount you actually transferred to SVS this calendar year to calculate tax correctly.",
+            
+            desc_fam: "<span class='pop-title'>Family Bonus Plus</span>A direct tax credit reducing your income tax bill.<br>• Up to 2,000 € per child (< 18).<br>• Up to 650 € per child (> 18).",
+            desc_sole: "<span class='pop-title'>Sole Earner (AVAB)</span>A <em>refundable</em> tax credit. You receive this cash even if your income tax is zero!<br><br><strong>Requirements:</strong><br>1. You have at least <strong>1 Child</strong> (Family Allowance).<br>2. Married/cohabiting > 6 months.<br>3. Partner income under <strong>6,937 €</strong>/year.",
+            
+            desc_taxbase: "<span class='pop-title'>Tax Base Calculation</span>This is the amount you actually pay tax on.<br><br><strong>Formula:</strong><br>+ Revenue (excl. VAT)<br>− Flat Expenses<br>− Paid SVS Contributions<br>− Profit Allowance (15%)<br>= <strong>Tax Base</strong>",
+            desc_cred_res: "<span class='pop-title'>Tax Credits</span>The sum of <strong>Family Bonus Plus</strong> and <strong>Sole Earner Credit (AVAB)</strong>.<br><br>This amount is subtracted directly from your calculated income tax.",
+
+            view_mo: "Monthly", view_yr: "Yearly", net_mo: "Net (Monthly)", net_yr: "Net (Yearly)",
+            alert_limit: "⚠️ VAT THRESHOLD (55k): Above 55,000 €, you become liable for VAT!",
+            alert_joker: "⚠️ TOLERANCE RULE: Between 40k and 55k, Small Biz Rate is allowed only <strong>ONCE every 5 years</strong>!"
+        },
+        sl: {
+            tab_main: "Polni S.P.", tab_side: "Popoldanski S.P.",
+            sec_biz: "Poslovni podatki", sec_fam: "Družina in olajšave",
+            label_revenue: "Letni promet (brez DDV)", label_type: "Dejavnost", label_pausch: "Način pavšala", label_svs: "Plačani SVS (lani)",
+            label_kids: "Otroci (< 18 let)", label_sole: "Edini hranilec (AVAB)", lbl_partner_inc: "Partnerjev dohodek",
+            
+            opt_service: "Storitve / Znanje", opt_trade: "Trgovina / Obrt",
+            opt_klein_serv: "Mali: Storitve (20%)", opt_klein_trade: "Mali: Trgovina (45%)", 
+            opt_basis_serv: "Osnovni: Storitve (6%)", opt_basis_trade: "Osnovni: Trgovina (12%)",
+            
+            res_expenses: "Pavšalni stroški", res_profit: "Davčna osnova", res_tax: "Dohodnina",
+            res_svs: "SVS Prispevki", res_net: "Neto", lbl_credits: "Družinski bonus + AVAB",
+            det_kv: "Zdravstvo (KV)", det_pv: "Pokojnina (PV)", det_sv: "Samooskrba (SVS)",
+            lbl_total_tax: "Skupaj dajatve:",
+            
+            desc_haupt: "<span class='pop-title'>Polni S.P. (GSVG)</span>Polno zavarovanje pri SVS.<br><br>⚠️ <strong>Opozorilo:</strong> V Avstriji ni trajnega popusta za nove podjetnike. Prvi dve leti plačujete manj, a SVS v 3. letu naredi poračun (doplačilo)!",
+            desc_neben: "<span class='pop-title'>Popoldanski S.P.</span>Zavarovani ste preko redne službe (40h).<br><ul class='pop-list'><li><strong>Dobiček < 6.221€:</strong> Plačate le ~136€/leto za nezgodno zavarovanje.</li><li><strong>Dobiček > 6.221€:</strong> Plačati morate polne prispevke SVS.</li></ul>",
+            desc_revenue: "<span class='pop-title'>Limiti</span>Vnesite <strong>Promet brez DDV</strong>.<br><br><ul class='pop-list'><li><strong>Do 40.000 €:</strong> Varno območje za Malega podjetnika.</li><li><strong>Do 55.000 €:</strong> Dovoljeno enkrat na 5 let (toleranca).</li><li><strong>Nad 55.000 €:</strong> Postanete zavezanec za DDV in izgubite status malega podjetnika!</li></ul>",
+            desc_type: "<span class='pop-title'>Vrsta dejavnosti</span>Določa višino stroškov.<br><br><strong>Storitve (20% / 6%):</strong><br>Intelektualne storitve, IT, svetovanje.<br><br><strong>Trgovina (45% / 12%):</strong><br>Prodaja blaga, proizvodnja, obrt, gostinstvo.",
+            desc_pausch: "<span class='pop-title'>Kateri pavšal?</span><strong>1. Mali podjetnik (Kleinunternehmer):</strong><br>Najbolje za < 40k. Visoki stroški (45% ali 20%). Brez knjigovodstva.<br><br><strong>2. Osnovni pavšal (Basis):</strong><br>Za promet do 220k. Nižji stroški (12% ali 6%).",
+            desc_svs_input: "Vnesite znesek, ki ste ga v tem letu dejansko nakazali na SVS, za točen izračun davka.",
+            
+            desc_fam: "<span class='pop-title'>Družinski bonus Plus</span>Direktno znižanje davka.<br>• Do 2.000 € na otroka (< 18).<br>• Do 650 € na otroka (> 18).",
+            desc_sole: "<span class='pop-title'>Edini hranilec (AVAB)</span>Vračljiv davčni kredit (negativni davek).<br><br><strong>Pogoji:</strong><br>1. Imate vsaj <strong>1 otroka</strong> (otroški dodatek).<br>2. Poročeni/skupno življenje > 6 mesecev.<br>3. Partnerjev dohodek pod <strong>6.937 €</strong>/leto.",
+            
+            desc_taxbase: "<span class='pop-title'>Davčna osnova</span>Znesek, od katerega plačate davek.<br><br><strong>Izračun:</strong><br>+ Promet (brez DDV)<br>− Pavšalni stroški<br>− Plačani SVS prispevki<br>− Olajšava (15%)<br>= <strong>Osnova</strong>",
+            desc_cred_res: "<span class='pop-title'>Davčni krediti</span>Vsota <strong>Družinskega bonusa</strong> in <strong>AVAB</strong>.<br><br>Ta znesek se odšteje neposredno od izračunane dohodnine.",
+
+            view_mo: "Mesečno", view_yr: "Letno", net_mo: "Neto (Mesec)", net_yr: "Neto (Leto)",
+            alert_limit: "⚠️ LIMIT (55k): Nad 55.000 € postane obvezen DDV!",
+            alert_joker: "⚠️ TOLERANČNO PRAVILO: Med 40k in 55k je status malega podjetnika dovoljen le <strong>1x na 5 let</strong>!"
+        },
+        ua: {
+            tab_main: "Основна зайнятість", tab_side: "Додаткова",
+            sec_biz: "Дані про бізнес", sec_fam: "Сім'я та пільги",
+            label_revenue: "Річний дохід (без ПДВ)", label_type: "Діяльність", label_pausch: "Тип паушалу", label_svs: "Сплачено SVS (торік)",
+            label_kids: "Діти (< 18 років)", label_sole: "Єдиний годувальник", lbl_partner_inc: "Дохід партнера",
+            
+            opt_service: "Послуги / Знання", opt_trade: "Торгівля / Виробництво",
+            opt_klein_serv: "Малий: Послуги (20%)", opt_klein_trade: "Малий: Торгівля (45%)", 
+            opt_basis_serv: "Базовий: Послуги (6%)", opt_basis_trade: "Базовий: Торгівля (12%)",
+            
+            res_expenses: "Паушальні витрати", res_profit: "Податкова база", res_tax: "Податок на дохід",
+            res_svs: "Внески SVS", res_net: "Чистий дохід", lbl_credits: "Сімейний бонус + AVAB",
+            det_kv: "Медицина (KV)", det_pv: "Пенсія (PV)", det_sv: "Самозабезп. (SVS)",
+            lbl_total_tax: "Всього податків:",
+            
+            desc_haupt: "<span class='pop-title'>Основна зайнятість (GSVG)</span>Повне страхування SVS.<br><br>⚠️ <strong>Увага:</strong> В Австрії немає постійної знижки. Перші 2 роки ви платите менше, але на 3-й рік SVS вимагатиме доплату (Nachzahlung)!",
+            desc_neben: "<span class='pop-title'>Додаткова зайнятість</span>Ви застраховані на основній роботі.<br><ul class='pop-list'><li><strong>Прибуток < 6.221€:</strong> Лише ~136€/рік (страховка від нещасних випадків).</li><li><strong>Прибуток > 6.221€:</strong> Повні внески SVS.</li></ul>",
+            desc_revenue: "<span class='pop-title'>Ліміти</span>Введіть <strong>Дохід без ПДВ</strong>.<br><br><ul class='pop-list'><li><strong>До 40.000 €:</strong> Безпечна зона для малого підприємця.</li><li><strong>До 55.000 €:</strong> Дозволено 1 раз на 5 років.</li><li><strong>Понад 55.000 €:</strong> Ви стаєте платником ПДВ і втрачаєте статус!</li></ul>",
+            desc_type: "<span class='pop-title'>Тип діяльності</span>Визначає відсоток витрат.<br><br><strong>Послуги (20% / 6%):</strong><br>IT, консалтинг, викладання.<br><br><strong>Торгівля (45% / 12%):</strong><br>Продаж товарів, ремесла, будівництво.",
+            desc_pausch: "<span class='pop-title'>Який паушал?</span><strong>1. Малий підприємець (Kleinunternehmer):</strong><br>Краще для < 40k. Високі витрати (45% або 20%).<br><br><strong>2. Базовий (Basis):</strong><br>Для доходу до 220k. Нижчі витрати (12% або 6%).",
+            desc_svs_input: "Введіть суму, яку ви фактично сплатили SVS цього року, для точного розрахунку податку.",
+            
+            desc_fam: "<span class='pop-title'>Сімейний бонус Плюс</span>Пряме зменшення податку.<br>• До 2.000 € на дитину (< 18).<br>• До 650 € на дитину (> 18).",
+            desc_sole: "<span class='pop-title'>Єдиний годувальник (AVAB)</span>Податковий кредит, що повертається.<br><br><strong>Умови:</strong><br>1. Ви маєте принаймні <strong>1 дитину</strong>.<br>2. У шлюбі/партнерстві > 6 місяців.<br>3. Дохід партнера менше <strong>6.937 €</strong>/рік.",
+            
+            desc_taxbase: "<span class='pop-title'>Податкова база</span>Сума, з якої сплачується податок.<br><br><strong>Формула:</strong><br>+ Дохід (без ПДВ)<br>− Витрати<br>− Внески SVS<br>− Пільга (15%)<br>= <strong>База</strong>",
+            desc_cred_res: "<span class='pop-title'>Податкові кредити</span>Сума <strong>Сімейного бонуса</strong> та <strong>AVAB</strong>.<br><br>Віднімається безпосередньо від розрахованого податку.",
+
+            view_mo: "Щомісяця", view_yr: "Щорічно", net_mo: "Нетто (Місяць)", net_yr: "Нетто (Рік)",
+            alert_limit: "⚠️ ЛІМІТ (55k): Понад 55.000 € ви зобов'язані платити ПДВ!",
+            alert_joker: "⚠️ Правило толерантності: Між 40k і 55k статус малого підприємця дозволено лише <strong>1 раз на 5 років</strong>!"
+        }
+    };
+
+    function detectLanguage() {
+        const lang = navigator.language || navigator.userLanguage || 'en';
+        if (lang.startsWith('de')) return 'de';
+        if (lang.startsWith('sl')) return 'sl';
+        if (lang.startsWith('uk') || lang.startsWith('ua')) return 'ua';
+        return 'en';
+    }
+
+    let state = { mode: 'haupt', lang: detectLanguage(), theme: 'light', view: 'yearly' };
+
+    function init() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            state.theme = 'dark';
+            applyTheme();
+        }
+        document.getElementById('btn-lang').innerText = state.lang.toUpperCase();
+
+        document.addEventListener('click', function(e) {
+            const trigger = e.target.closest('.info-trigger');
+            if (trigger) {
+                e.stopPropagation();
+                const id = trigger.getAttribute('data-tip');
+                const target = document.getElementById(id);
+                document.querySelectorAll('.popover').forEach(p => { if (p.id !== id) p.classList.remove('visible'); });
+                if(target) target.classList.toggle('visible');
+            } else if (!e.target.closest('.popover')) {
+                document.querySelectorAll('.popover').forEach(p => p.classList.remove('visible'));
+            }
+        });
+
+        updateLabels();
+        updatePauschOptions(); // Init dropdown
+        calc();
+    }
+
+    function toggleTheme() { state.theme = state.theme === 'light' ? 'dark' : 'light'; applyTheme(); }
+    function applyTheme() { document.documentElement.setAttribute('data-theme', state.theme); }
+
+    function toggleLang() {
+        const map = { 'de': 'en', 'en': 'sl', 'sl': 'ua', 'ua': 'de' };
+        state.lang = map[state.lang];
+        document.getElementById('btn-lang').innerText = state.lang.toUpperCase();
+        updateLabels();
+        updatePauschOptions(); // Re-populate with new language
+        calc();
+    }
+
+    function updateLabels() {
+        const t = TEXT[state.lang];
+        document.querySelectorAll('[data-t]').forEach(el => {
+            const key = el.getAttribute('data-t');
+            if (t[key]) el.innerHTML = t[key];
+        });
+        document.getElementById('lbl-net').innerText = state.view === 'monthly' ? t.net_mo : t.net_yr;
+    }
+
+    function updatePauschOptions() {
+        const biz = document.getElementById('biz-type').value;
+        const pausch = document.getElementById('pausch-type');
+        const t = TEXT[state.lang];
+        const prevVal = pausch.value;
+
+        pausch.innerHTML = ""; // Clear options
+
+        if (biz === 'service') {
+            // Service options (20% or 6%)
+            const opt1 = document.createElement('option'); opt1.value = "klein_service"; opt1.text = t.opt_klein_serv;
+            const opt2 = document.createElement('option'); opt2.value = "basis_service"; opt2.text = t.opt_basis_serv;
+            pausch.add(opt1); pausch.add(opt2);
+        } else {
+            // Trade options (45% or 12%)
+            const opt1 = document.createElement('option'); opt1.value = "klein_trade"; opt1.text = t.opt_klein_trade;
+            const opt2 = document.createElement('option'); opt2.value = "basis_trade"; opt2.text = t.opt_basis_trade;
+            pausch.add(opt1); pausch.add(opt2);
+        }
+        
+        // Smart selection persistence
+        if(prevVal && prevVal.includes('basis') && (pausch.options.length > 1)) pausch.value = pausch.options[1].value;
+        else pausch.value = pausch.options[0].value;
+        
+        calc(); 
+    }
+
+    function stepVal(id, direction) {
+        document.getElementById(id).stepUp(direction);
+        calc();
+    }
+
+    function setMode(mode, event) {
+        if(event && event.target.closest('.info-trigger')) return;
+        state.mode = mode;
+        document.getElementById('tab-haupt').className = mode === 'haupt' ? 'toggle-btn active' : 'toggle-btn';
+        document.getElementById('tab-neben').className = mode === 'neben' ? 'toggle-btn active' : 'toggle-btn';
+        calc();
+    }
+
+    function setView(view) {
+        state.view = view;
+        document.getElementById('view-mo').className = view === 'monthly' ? 'view-btn active' : 'view-btn';
+        document.getElementById('view-yr').className = view === 'yearly' ? 'view-btn active' : 'view-btn';
+        updateLabels();
+        calc();
+    }
+
+    function fmt(n) { return n.toLocaleString(state.lang === 'de' ? 'de-DE' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+
+    function getIncomeTax(taxableIncome) {
+        if (taxableIncome <= 0) return 0;
+        let tax = 0;
+        let previousLimit = 0;
+        
+        for (let bracket of CONFIG.tax_brackets) {
+            if (taxableIncome > bracket.limit) {
+                tax += (bracket.limit - previousLimit) * bracket.rate;
+                previousLimit = bracket.limit;
+            } else {
+                tax += (taxableIncome - previousLimit) * bracket.rate;
+                return tax;
+            }
+        }
+        return tax;
+    }
+
+    function calc() {
+        const rev = parseFloat(document.getElementById('revenue').value) || 0;
+        const pauschType = document.getElementById('pausch-type').value;
+        const svsPaidInput = parseFloat(document.getElementById('svs-paid').value) || 0;
+        
+        const kids = parseInt(document.getElementById('kids').value) || 0;
+        const isSoleEarner = document.getElementById('is-sole').checked;
+
+        const div = state.view === 'monthly' ? 12 : 1;
+
+        // 1. Calculate Expenses based on dynamic dropdown
+        let expenseRate = 0;
+        let isKlein = false;
+
+        if (pauschType === 'klein_service') { expenseRate = 0.20; isKlein = true; }
+        else if (pauschType === 'klein_trade') { expenseRate = 0.45; isKlein = true; }
+        else if (pauschType === 'basis_service') { expenseRate = 0.06; }
+        else if (pauschType === 'basis_trade') { expenseRate = 0.12; }
+
+        let expenses = rev * expenseRate;
+        
+        // Basispauschalierung Caps
+        if (!isKlein) {
+             const isService = pauschType.includes('service');
+             const maxBasisExp = isService ? 13200 : 26400; 
+             expenses = Math.min(expenses, maxBasisExp);
+        }
+
+        // 2. SVS Calculation
+        let rawProfit = rev - expenses;
+        let svsBase = rawProfit; 
+        const minBaseGSVG = 6010.92; 
+        
+        let svsTotal = 0, svsKV = 0, svsPV = 0, svsSelf = 0;
+        
+        if (state.mode === 'neben' && rawProfit <= CONFIG.limits.geringf) {
+            svsTotal = CONFIG.rates.svs_uv_yr;
+        } else {
+            let insuranceBase = Math.max(svsBase, minBaseGSVG); 
+            insuranceBase = Math.min(insuranceBase, 84840);
+
+            svsKV = insuranceBase * CONFIG.rates.svs_kv;
+            svsPV = insuranceBase * CONFIG.rates.svs_pv;
+            svsSelf = insuranceBase * CONFIG.rates.svs_self;
+            let svsUV = CONFIG.rates.svs_uv_yr;
+            svsTotal = svsKV + svsPV + svsSelf + svsUV;
+        }
+
+        // 3. Tax Calculation
+        const svsDeductible = svsPaidInput > 0 ? svsPaidInput : svsTotal;
+        let profitAfterSvs = Math.max(0, rawProfit - svsDeductible);
+        
+        let gfb = Math.min(profitAfterSvs * CONFIG.rates.gfb, CONFIG.rates.gfb_max);
+        let taxableIncome = Math.max(0, profitAfterSvs - gfb);
+        let tax = getIncomeTax(taxableIncome);
+
+        // 4. Family Credits
+        let totalCredits = 0;
+        totalCredits += kids * CONFIG.family.fabo_plus;
+
+        if (isSoleEarner && kids > 0) {
+            if (kids === 1) totalCredits += CONFIG.family.avab_1;
+            else if (kids === 2) totalCredits += CONFIG.family.avab_2;
+            else totalCredits += CONFIG.family.avab_2 + ((kids - 2) * CONFIG.family.avab_next);
+        }
+
+        let finalTax = tax - totalCredits;
+        
+        // 5. Net
+        let net = rev - svsTotal - finalTax;
+
+        // UI Updates
+        document.getElementById('out-exp').innerText = fmt((expenses) / div);
+        document.getElementById('badge-exp').innerText = (expenseRate * 100).toFixed(0) + '%';
+        
+        document.getElementById('out-profit').innerText = fmt(taxableIncome / div);
+        
+        document.getElementById('out-tax').innerText = fmt(finalTax / div);
+        document.getElementById('out-tax').className = finalTax < 0 ? 'val text-green' : 'val text-red';
+        
+        if (totalCredits > 0) {
+            document.getElementById('tax-credits-row').style.display = 'flex';
+            document.getElementById('out-credits').innerText = '-' + fmt(totalCredits / div);
+        } else {
+            document.getElementById('tax-credits-row').style.display = 'none';
+        }
+
+        let taxPct = rev > 0 ? (Math.max(0, finalTax)/rev)*100 : 0;
+        document.getElementById('badge-tax').innerText = taxPct.toFixed(1) + '%';
+        
+        document.getElementById('out-svs-total').innerText = fmt(svsTotal / div);
+        let svsPct = rev > 0 ? (svsTotal/rev)*100 : 0;
+        document.getElementById('badge-svs').innerText = svsPct.toFixed(1) + '%';
+        
+        document.getElementById('out-kv').innerText = fmt(svsKV / div);
+        document.getElementById('out-pv').innerText = fmt(svsPV / div);
+        document.getElementById('out-sv').innerText = fmt(svsSelf / div);
+        
+        document.getElementById('out-net').innerText = fmt(net / div);
+        
+        const totalPaid = finalTax + svsTotal; 
+        document.getElementById('out-total-paid').innerText = fmt(totalPaid / div);
+        document.getElementById('out-effective-rate').innerText = (rev > 0 ? (totalPaid/rev)*100 : 0).toFixed(1) + '%';
+
+        const alertBox = document.getElementById('alert-box');
+        alertBox.style.display = 'none';
+        
+        // Alerts
+        if (isKlein) {
+            if (rev > 55000) {
+                alertBox.style.display = 'block';
+                alertBox.className = 'limit-alert breach';
+                alertBox.innerHTML = TEXT[state.lang].alert_limit;
+            } else if (rev > 40000) {
+                alertBox.style.display = 'block';
+                alertBox.className = 'limit-alert'; // Warning Orange
+                alertBox.innerHTML = TEXT[state.lang].alert_joker;
+            }
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
